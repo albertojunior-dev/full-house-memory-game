@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<!--
+  Mesa Cheia — a memory-training game for waitstaff.
+  Single-page, no build step: this file holds the markup and base CSS;
+  redesign.css contains the visual refinement layer. data.js and app.js
+  (loaded at the bottom)
+  hold the content and behavior. See README.md for the full picture.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mesa Cheia — Treino de Empregado de Mesa</title>
+<!-- The same service-bell emblem used beside the Full House wordmark. -->
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=3" />
+<link rel="apple-touch-icon" href="assets/favicon.svg?v=3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- Libre Caslon Text = headlines, Manrope = body copy, Hanken Grotesk = small labels/uppercase text. -->
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Hanken+Grotesk:wght@400;600;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet" />
+<!-- Icon font used via <span class="material-symbols-outlined">icon_name</span> throughout the app. -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<style>
+/* Design tokens: every color/font used below is one of these CSS variables,
+   so the whole "Sommelier Reserve" palette can be re-themed from one place. */
+:root {
+  --bg: #1b110a;
+  --bg-panel: #33281f;
+  --card: #241a12;
+  --card-alt: #281e15;
+  --wood: #3e3229;
+  --gold: #eac081;
+  --on-gold: #442c00;
+  --gold-container: #c8a064;
+  --on-gold-container: #523703;
+  --cream: #f3dfd2;
+  --muted: #d2c4b5;
+  --outline: #9b8f81;
+  --outline-variant: #4e453a;
+  --input-bg: #150c06;
+  --green: #4ade80;
+  --green-bg: rgba(74, 222, 128, 0.12);
+  --red: #f87171;
+  --red-bg: rgba(248, 113, 113, 0.12);
+  --font-headline: "Libre Caslon Text", Georgia, serif;
+  --font-body: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-label: "Hanken Grotesk", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: radial-gradient(circle at top, #2a1f14, #120b06 70%);
+  color: var(--cream);
+  min-height: 100vh;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.hidden { display: none !important; }
+
+/* Navbar */
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px clamp(16px, 5vw, 64px);
+  background: var(--bg);
+  border-bottom: 1px solid var(--outline-variant);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+#app-title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.3rem, 5vw, 1.8rem);
+  margin: 0;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+}
+#app-subtitle { color: var(--muted); margin: 2px 0 0; font-size: 0.85rem; }
+.navlinks { display: flex; gap: 22px; }
+.nav-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.nav-link:hover { color: var(--gold); }
+.nav-link.active { color: var(--gold); border-color: var(--gold); }
+
+#app { max-width: 1200px; margin: 0 auto; }
+#main-layout, #dashboard-layout { padding: 24px 16px 60px; max-width: 1100px; margin: 0 auto; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: inset 0 0 15px rgba(234, 192, 129, 0.05), 0 6px 18px rgba(0,0,0,0.35);
+}
+
+/* Setup screen: language, guest count, order style, menu mode. */
+#screen-setup { max-width: 420px; margin: 40px auto; }
+.welcome-text {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  text-align: center;
+  margin: 0 0 20px;
+}
+
+.navbar-right { display: flex; align-items: center; gap: 16px; }
+.mute-btn {
+  background: transparent;
+  border: 1px solid var(--outline-variant);
+  color: var(--muted);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: none;
+}
+.mute-btn:hover { border-color: var(--gold); color: var(--gold); }
+.mute-btn .material-symbols-outlined { font-size: 19px; }
+
+#site-footer {
+  text-align: center;
+  padding: 24px 16px 40px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  border-top: 1px solid var(--outline-variant);
+  margin-top: 20px;
+}
+#site-footer p { margin: 0; }
+
+.field { display: block; margin-bottom: 18px; }
+.field-label { display: block; margin-bottom: 6px; color: var(--gold); font-family: var(--font-label); font-size: 0.85rem; font-weight: 600; }
+.field-checkbox { display: flex; align-items: center; gap: 8px; }
+.field-checkbox input { width: 18px; height: 18px; }
+.field-checkbox span { color: var(--cream); font-size: 0.9rem; }
+
+select, input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--outline-variant);
+  background: var(--input-bg);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.btn-primary, .btn-secondary {
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--on-gold);
+  width: 100%;
+  transition: filter 0.15s, transform 0.1s;
+}
+.btn-primary:hover { filter: brightness(0.92); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-secondary {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-secondary:hover { background: rgba(234, 192, 129, 0.1); }
+.btn-secondary:active { transform: scale(0.98); }
+
+/* Active-table layout: a sticky menu sidebar next to the current stage
+   (order/register/recap/results — only one visible at a time via .hidden). */
+#screen-game { display: flex; gap: 24px; align-items: flex-start; }
+
+#menu-panel {
+  flex: 0 0 260px;
+  background: var(--bg-panel);
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  padding: 16px;
+  position: sticky;
+  top: 16px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: inset 0 0 15px rgba(234, 192, 129, 0.06);
+}
+#menu-panel summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+}
+#menu-panel summary::-webkit-details-marker { display: none; }
+#menu-panel summary::marker { content: ""; }
+#menu-title { color: var(--gold); margin: 0; font-family: var(--font-headline); font-size: 1.2rem; }
+.menu-chevron { color: var(--gold); transition: transform 0.2s ease; }
+#menu-details[open] .menu-chevron { transform: rotate(180deg); }
+#menu-content { margin-top: 14px; }
+.menu-cat { margin-bottom: 14px; }
+.menu-cat .menu-cat-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.menu-cat .menu-cat-head .material-symbols-outlined { font-size: 16px; color: var(--gold); }
+.menu-cat h3 { color: var(--gold); font-family: var(--font-label); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+.menu-cat ul { list-style: none; margin: 0; padding: 0; }
+.menu-cat li { font-size: 0.88rem; padding: 3px 0; border-bottom: 1px dashed var(--outline-variant); }
+
+#stage { flex: 1; min-width: 0; }
+
+#mode-banner {
+  background: var(--wood);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--gold);
+  margin-bottom: 16px;
+  border: 1px solid var(--outline-variant);
+}
+
+.stage-panel h2 { color: var(--cream); margin-top: 0; font-family: var(--font-headline); }
+.hint { color: var(--muted); font-size: 0.9rem; margin-top: -8px; }
+
+/* Order-taking screen: title + Exit button, and the exit confirmation card
+   that slides in below (see #exit-confirm in the body markup). */
+.order-top-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.order-top-row h2 { margin: 0; }
+.btn-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--outline-variant);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-exit .material-symbols-outlined { font-size: 17px; }
+.btn-exit:hover { border-color: var(--red); color: var(--red); }
+
+.exit-confirm-card { border-color: var(--red); background: var(--red-bg); margin-top: 14px; margin-bottom: 0; }
+.exit-confirm-card p { margin: 0 0 14px; color: var(--cream); }
+.btn-danger {
+  cursor: pointer;
+  border: 1px solid var(--red);
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  background: transparent;
+  color: var(--red);
+  flex: 1;
+}
+.btn-danger:hover { background: var(--red-bg); }
+
+#order-progress { color: var(--muted); font-size: 0.85rem; margin: 10px 0 14px; font-family: var(--font-label); }
+
+#boneco-card { text-align: center; position: relative; overflow: hidden; }
+#boneco-name { font-size: 1.5rem; font-weight: 700; font-family: var(--font-headline); color: var(--cream); margin-top: 0; }
+#boneco-status { color: var(--muted); font-size: 0.95rem; font-style: italic; margin: 4px 0 16px; min-height: 1.2em; }
+#boneco-text {
+  background: var(--input-bg);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-style: italic;
+  color: var(--cream);
+}
+
+.btn-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+.btn-row .btn-primary, .btn-row .btn-secondary { width: auto; flex: 1; }
+.btn-next { max-width: 260px; margin: 0 auto; display: flex; }
+
+#register-list, #recap-list, #results-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+
+.person-card {
+  background: var(--card);
+  border: 1px solid var(--outline-variant);
+  border-radius: 10px;
+  padding: 16px;
+}
+.person-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.person-card-head .avatar { font-size: 1.8rem; }
+.person-card-head .name { font-weight: 700; font-size: 1.1rem; font-family: var(--font-headline); }
+
+/* Register screen: one .chip-field per course inside each guest's
+   .person-card, rendered by chipFieldHTML() in app.js. */
+.chip-field { margin-bottom: 14px; }
+.chip-field:last-child { margin-bottom: 0; }
+.chip-field .field-label { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; margin-bottom: 8px; }
+.chip-field .field-label .material-symbols-outlined { font-size: 15px; }
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 7px 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--outline-variant);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip:hover { border-color: var(--gold); color: var(--gold); }
+.chip.active { background: var(--gold); border-color: var(--gold); color: var(--on-gold); font-weight: 700; }
+
+.recap-line { padding: 4px 0; font-size: 0.95rem; }
+.recap-line b { color: var(--gold); }
+
+/* Results screen: #results-score holds the circular gauge (see the
+   "Circular score gauge" rules further down); .result-row is one
+   correct/wrong line per guest per course. */
+#results-score { text-align: center; margin-bottom: 20px; }
+
+.result-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--outline-variant); font-size: 0.92rem; }
+.result-row .row-left { display: flex; align-items: center; gap: 10px; }
+.result-row .row-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex: none;
+}
+.result-row.ok .row-icon { background: var(--green-bg); color: var(--green); }
+.result-row.bad .row-icon { background: var(--red-bg); color: var(--red); }
+.result-row.ok .row-icon .material-symbols-outlined { font-variation-settings: "FILL" 1; }
+.result-row .field-name { color: var(--muted); font-family: var(--font-label); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; min-width: 90px; }
+.result-row .answers { text-align: right; flex: 1; }
+.result-row.bad .answers .missed { color: var(--red); text-decoration: line-through; }
+.result-row.bad .answers .truth { color: var(--cream); display: block; font-size: 0.85rem; margin-top: 2px; }
+
+/* Responsive breakpoints. Tablet/narrow desktop: stack the sidebar above
+   the stage and tighten up spacing. Phone: shrink the seating chart,
+   gauge and stat grid further, and stack action buttons full-width. */
+@media (max-width: 780px) {
+  #screen-game { flex-direction: column; }
+  #menu-panel { position: static; width: 100%; max-height: none; flex: none; }
+  #main-layout, #dashboard-layout { padding: 16px 12px 48px; }
+  .card { padding: 18px; }
+  .headline { font-size: 1.5rem; }
+  .stat-value { font-size: 1.9rem; }
+  .dash-header { align-items: stretch; }
+  .btn-cta { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  #navbar { padding: 14px 16px; }
+  #app-subtitle { font-size: 0.78rem; }
+  .navlinks { gap: 14px; }
+  .nav-link { font-size: 0.72rem; }
+  #table-view { height: 220px; }
+  .seat { width: 52px; }
+  .seat .avatar-circle { width: 38px; height: 38px; font-size: 1.35rem; }
+  .seat .seat-name { font-size: 0.62rem; max-width: 52px; }
+  .btn-row { flex-direction: column; }
+  .btn-row .btn-primary, .btn-row .btn-secondary { width: 100%; }
+  .gauge-wrap { width: 150px; height: 150px; }
+  .gauge-pct { font-size: 1.8rem; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .badge-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Menu builder screen: a checklist grid per category (see renderMenuBuilder
+   in app.js), reached from setup when "Choose the dishes" is selected. */
+#screen-menu-builder { max-width: 780px; margin: 24px auto; }
+#menu-builder-card { max-width: 100%; }
+#menu-builder-title { font-family: var(--font-headline); }
+
+.mb-cat { margin-bottom: 22px; }
+.mb-cat:last-child { margin-bottom: 0; }
+.mb-cat-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.mb-cat-head h3 { color: var(--gold); margin: 0; font-family: var(--font-label); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
+.mb-cat-head h3 .material-symbols-outlined { font-size: 16px; }
+.mb-cat-actions { display: flex; gap: 6px; }
+.mb-mini-btn {
+  background: transparent;
+  border: 1px solid var(--outline-variant);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+.mb-mini-btn:hover { border-color: var(--gold); color: var(--gold); }
+.mb-count { font-size: 0.8rem; color: var(--green); margin: 6px 0 8px; font-family: var(--font-label); }
+.mb-count.mb-count-bad { color: var(--red); }
+.mb-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 14px; }
+.mb-check { display: flex; align-items: center; gap: 6px; font-size: 0.88rem; cursor: pointer; }
+.mb-check input { width: 16px; height: 16px; flex: none; }
+
+/* Table view */
+#table-view {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 280px;
+  margin: 0 auto 22px;
+}
+#table-surface {
+  position: absolute;
+  inset: 18% 12%;
+  background: radial-gradient(ellipse at center, #4a3520, #1f1409 85%);
+  border-radius: 50%;
+  border: 6px solid var(--wood);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.5), inset 0 0 15px rgba(234, 192, 129, 0.1);
+}
+.seat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 64px;
+  opacity: 0.7;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+.seat.active {
+  opacity: 1;
+  filter: drop-shadow(0 0 12px rgba(234, 192, 129, 0.5));
+  z-index: 5;
+  animation: seat-float 2.4s ease-in-out infinite;
+}
+.seat .speech-bubble {
+  position: relative;
+  display: inline-block;
+  background: var(--wood);
+  border: 1px solid var(--outline-variant);
+  color: var(--cream);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  margin-bottom: 8px;
+  animation: bubble-pulse 1.1s infinite ease-in-out;
+}
+.seat .speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: var(--wood) transparent transparent;
+}
+.seat .avatar-circle {
+  font-size: 1.7rem;
+  background: var(--card);
+  border: 2px solid var(--outline-variant);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+.seat.active .avatar-circle { border-color: var(--gold); border-width: 3px; background: var(--card-alt); }
+.seat .seat-name {
+  font-size: 0.72rem;
+  margin-top: 4px;
+  color: var(--cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 64px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.seat.active .seat-name { color: var(--gold); font-weight: 700; }
+.seat .progress-dots { display: flex; gap: 3px; justify-content: center; margin-top: 4px; }
+.seat .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--outline-variant); }
+.seat .dot.done { background: var(--green); }
+
+@keyframes bubble-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+@keyframes seat-float {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-5px); }
+}
+
+/* Circular score gauge */
+.gauge-wrap { position: relative; width: 176px; height: 176px; margin: 0 auto 12px; }
+.gauge-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.gauge-track { stroke: var(--wood); }
+.gauge-fill { stroke: var(--gold); transition: stroke-dashoffset 1.2s ease-out; }
+.gauge-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.gauge-pct { font-family: var(--font-headline); font-size: 2.1rem; color: var(--gold); }
+.gauge-status { font-family: var(--font-label); font-size: 0.68rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
+.gauge-sub { text-align: center; color: var(--muted); font-size: 0.9rem; }
+
+/* Dashboard */
+.dash-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+.headline { font-family: var(--font-headline); font-size: 1.9rem; margin: 0 0 4px; color: var(--cream); }
+.headline-sm { font-family: var(--font-headline); font-size: 1.3rem; margin: 0 0 20px; color: var(--cream); }
+.btn-cta { width: auto; padding: 12px 24px; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 20px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--outline-variant);
+  border-radius: 12px;
+  padding: 26px 20px;
+  text-align: center;
+  box-shadow: inset 0 0 15px rgba(234, 192, 129, 0.06);
+}
+.stat-card .material-symbols-outlined { color: var(--gold); font-size: 2rem; opacity: 0.85; margin-bottom: 8px; }
+.stat-label { font-family: var(--font-label); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.stat-value { font-family: var(--font-headline); font-size: 2.2rem; color: var(--gold); }
+.stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+.dash-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 28px; }
+@media (min-width: 900px) {
+  .dash-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.bar-row { margin-bottom: 16px; }
+.bar-row:last-child { margin-bottom: 0; }
+.bar-row .bar-head { display: flex; justify-content: space-between; font-family: var(--font-label); font-size: 0.7rem; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px; color: var(--muted); }
+.bar-row .bar-head .bar-pct { color: var(--gold); }
+.bar-track { height: 5px; background: var(--wood); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--gold); border-radius: 4px; width: 0; transition: width 1.2s ease; }
+
+.activity-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px dashed var(--outline-variant); }
+.activity-row:last-child { border-bottom: none; }
+.activity-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(234, 192, 129, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold); flex: none;
+}
+.activity-info { flex: 1; min-width: 0; }
+.activity-info h4 { margin: 0; font-size: 0.92rem; color: var(--cream); font-weight: 700; }
+.activity-info p { margin: 2px 0 0; font-size: 0.75rem; color: var(--muted); }
+.activity-score { text-align: right; flex: none; }
+.activity-score .pct { font-weight: 700; color: var(--gold); display: block; }
+.activity-score .time { font-size: 0.72rem; color: var(--muted); }
+
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 20px; }
+.badge-item { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.badge-circle {
+  width: 76px; height: 76px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--gold);
+  background: rgba(234, 192, 129, 0.1);
+  box-shadow: 0 0 15px rgba(234, 192, 129, 0.25);
+}
+.badge-circle .material-symbols-outlined { color: var(--gold); font-size: 1.8rem; }
+.badge-item.locked .badge-circle { border-color: var(--outline-variant); background: transparent; box-shadow: none; filter: grayscale(1); opacity: 0.5; }
+.badge-item.locked .badge-circle .material-symbols-outlined { color: var(--muted); }
+.badge-label { font-size: 0.75rem; color: var(--cream); }
+.badge-item.locked .badge-label { color: var(--muted); }
+.badge-item[title] { cursor: help; }
+
+.empty-note { color: var(--muted); font-style: italic; padding: 12px 0; }
+</style>
+<link rel="stylesheet" href="redesign.css?v=3" />
+</head>
+<body>
+<!--
+  Almost every visible bit of text below is a placeholder in Portuguese.
+  app.js overwrites it (via els.<name>.textContent/innerHTML) as soon as it
+  loads, based on the selected language in data.js's UI object — the
+  markup itself is language-agnostic, it just needs the right ids/classes
+  and enough static text so the page isn't blank if scripts are disabled.
+-->
+<div id="app">
+
+  <!-- Top bar: brand, Training/Dashboard tab switcher, mute toggle. -->
+  <header id="navbar">
+    <div class="brand-lockup">
+      <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined">room_service</span></span>
+      <div>
+      <h1 id="app-title">Mesa Cheia</h1>
+      <p id="app-subtitle">Treino de memória para empregados de mesa</p>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <div id="player-summary" class="player-summary">
+        <span id="player-level" class="player-level">N. 1</span>
+        <span id="player-title" class="player-title">Aprendiz</span>
+      </div>
+      <nav class="navlinks">
+        <button id="nav-training" class="nav-link active" type="button">Treino</button>
+        <button id="nav-career" class="nav-link" type="button">Carreira</button>
+        <button id="nav-dashboard" class="nav-link" type="button">Dashboard</button>
+      </nav>
+      <button id="btn-mute" class="mute-btn" type="button">
+        <span class="material-symbols-outlined" id="mute-icon">volume_up</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- "Training" tab: setup -> (optional menu builder) -> active table.
+       Only one of screen-setup / screen-menu-builder / screen-game is
+       visible at a time, toggled via the "hidden" class in app.js. -->
+  <div id="view-training">
+  <main id="main-layout">
+
+    <!-- Step 1: table setup (language, guest count, order style, menu mode). -->
+    <section id="screen-setup" class="screen">
+      <div class="setup-emblem" aria-hidden="true">
+        <span class="setup-emblem-ring"></span>
+        <span class="material-symbols-outlined">room_service</span>
+      </div>
+      <p id="welcome-text" class="welcome-text"></p>
+      <div class="card">
+        <label class="field">
+          <span id="label-lang" class="field-label">Idioma da mesa</span>
+          <select id="input-lang">
+            <option value="en" selected>🇬🇧 English</option>
+            <option value="pt">🇵🇹 Português</option>
+            <option value="es">🇪🇸 Español</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span id="label-people" class="field-label">Quantas pessoas na mesa?</span>
+          <input id="input-people" type="number" min="1" max="10" value="3" />
+        </label>
+
+        <label class="field field-checkbox">
+          <input id="input-recap" type="checkbox" checked />
+          <span id="label-recap">Repetir o pedido todo no fim, antes de fechar a mesa</span>
+        </label>
+        <p id="recap-help" class="field-help"></p>
+
+        <label class="field">
+          <span id="label-difficulty" class="field-label">Dificuldade</span>
+          <select id="input-difficulty">
+            <option value="beginner">Iniciante</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Difícil</option>
+            <option value="expert">Especialista</option>
+          </select>
+          <small id="difficulty-help" class="field-help"></small>
+        </label>
+
+        <label class="field field-checkbox">
+          <input id="input-similar-orders" type="checkbox" />
+          <span id="label-similar-orders">Incluir pedidos semelhantes</span>
+        </label>
+        <p id="similar-orders-help" class="field-help"></p>
+
+        <label class="field field-checkbox">
+          <input id="input-rush-hour" type="checkbox" />
+          <span id="label-rush-hour">Ativar Rush Hour</span>
+        </label>
+        <p id="rush-hour-help" class="field-help"></p>
+
+        <label class="field">
+          <span id="label-order-style" class="field-label">Como o pedido é tirado?</span>
+          <select id="input-order-style">
+            <option value="random">Aleatório (recomendado)</option>
+            <option value="full">Pedido completo por pessoa</option>
+            <option value="byCourse">Por curso</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span id="label-menu-mode" class="field-label">Como definir o menu de hoje?</span>
+          <select id="input-menu-mode">
+            <option value="random">Aleatório (recomendado)</option>
+            <option value="custom">Escolher os pratos</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span id="label-training-focus" class="field-label">O que queres treinar?</span>
+          <select id="input-training-focus">
+            <option value="complete">Pedido completo</option>
+            <option value="drinks">Só bebidas</option>
+            <option value="starters">Só entradas</option>
+            <option value="mains">Prato principal + acompanhamento</option>
+          </select>
+        </label>
+
+        <button id="btn-start" class="btn-primary">Nova Mesa</button>
+      </div>
+    </section>
+
+    <!-- Step 1b (optional): hand-pick the day's menu instead of a random one.
+         Only shown when "Choose the dishes" is selected in setup. -->
+    <section id="screen-menu-builder" class="screen hidden">
+      <div class="card" id="menu-builder-card">
+        <h2 id="menu-builder-title">Monta o menu de hoje</h2>
+        <p id="menu-builder-hint" class="hint"></p>
+        <div id="menu-builder-content"></div>
+        <div class="btn-row">
+          <button id="btn-menu-back" class="btn-secondary">← Voltar</button>
+          <button id="btn-menu-confirm" class="btn-primary">Começar Mesa</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 2: the active table. #menu-panel (the collapsible "Today's
+         Menu" reference) stays visible across all four stage panels below
+         it; only one of order/register/recap/results is shown at once. -->
+    <section id="screen-game" class="screen hidden">
+      <aside id="menu-panel">
+        <details id="menu-details" open>
+          <summary>
+            <span id="menu-title">Menu de hoje</span>
+            <span class="material-symbols-outlined menu-chevron">expand_more</span>
+          </summary>
+          <div id="menu-content"></div>
+        </details>
+      </aside>
+
+      <div id="stage">
+        <div id="mode-banner"></div>
+
+        <!-- Seating chart: shared across order/register/recap so the waiter
+             can always see who's sitting where (important for associating a
+             guest's seat with their order from memory). Hidden on the
+             results screen. Toggled by showStagePanel() in app.js. -->
+        <div id="table-view"></div>
+
+        <!-- Stage A: order-taking. One guest "speaks" at a time (renderOrderStep). -->
+        <div id="screen-order" class="stage-panel">
+          <div class="order-top-row">
+            <h2 id="order-title">A tirar o pedido</h2>
+            <button id="btn-exit-table" class="btn-exit" type="button">
+              <span class="material-symbols-outlined">logout</span>
+              <span id="btn-exit-table-label"></span>
+            </button>
+          </div>
+          <div id="order-progress"></div>
+
+          <!-- Hidden until "Exit" is clicked; the destructive choice
+               (#btn-exit-leave) does not save the table to history. -->
+          <div id="exit-confirm" class="card exit-confirm-card hidden">
+            <p id="exit-confirm-text"></p>
+            <div class="btn-row">
+              <button id="btn-exit-cancel" class="btn-secondary"></button>
+              <button id="btn-exit-leave" class="btn-danger"></button>
+            </div>
+          </div>
+
+          <div id="boneco-card" class="card">
+            <div id="boneco-avatar" class="speaker-avatar hidden" aria-hidden="true"></div>
+            <div id="boneco-name"></div>
+            <div id="boneco-status"></div>
+            <div id="boneco-text" class="hidden"></div>
+            <div class="btn-row">
+              <button id="btn-listen" class="btn-primary"></button>
+              <button id="btn-reveal" class="btn-secondary"></button>
+            </div>
+            <button id="btn-next" class="btn-primary btn-next"></button>
+          </div>
+        </div>
+
+        <!-- Stage B: register each guest's order from memory (renderRegisterScreen). -->
+        <div id="screen-register" class="stage-panel hidden">
+          <h2 id="register-title">Regista o pedido no sistema</h2>
+          <p id="register-hint" class="hint"></p>
+          <div id="register-list"></div>
+          <button id="btn-confirm-order" class="btn-primary">Confirmar Pedido</button>
+        </div>
+
+        <!-- Stage C (optional): re-read the table's order before closing it. -->
+        <div id="screen-recap" class="stage-panel hidden">
+          <h2 id="recap-title">Última chamada: confere o pedido da mesa</h2>
+          <p id="recap-hint" class="hint"></p>
+          <div id="recap-list"></div>
+          <div class="btn-row">
+            <button id="btn-recap-edit" class="btn-secondary">Voltar a corrigir</button>
+            <button id="btn-recap-confirm" class="btn-primary">Está tudo certo, fechar mesa</button>
+          </div>
+        </div>
+
+        <!-- Stage D: scored results (renderResultsScreen) — this is also
+             where the finished table gets saved to Dashboard history. -->
+        <div id="screen-results" class="stage-panel hidden">
+          <h2 id="results-title">Resultado</h2>
+          <div id="results-score"></div>
+          <div id="results-career" class="career-result hidden"></div>
+          <div id="results-xp" class="xp-result-card"></div>
+          <div id="results-list"></div>
+          <button id="btn-new-table" class="btn-primary">Nova Mesa</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  </div>
+
+  <!-- Progressive challenge path. Missions unlock in order and reuse the
+       same table, scoring and XP engines as free training. -->
+  <div id="view-career" class="hidden">
+    <main id="career-layout">
+      <div class="career-hero">
+        <div>
+          <span class="career-kicker">Mesa Cheia Academy</span>
+          <h2 id="career-title" class="headline">Modo Carreira</h2>
+          <p id="career-subtitle" class="hint"></p>
+          <p id="career-progress" class="career-progress"></p>
+        </div>
+        <label class="career-language">
+          <span id="career-lang-label" class="field-label">Idioma dos clientes</span>
+          <select id="career-lang">
+            <option value="en">🇬🇧 English</option>
+            <option value="pt">🇵🇹 Português</option>
+            <option value="es">🇪🇸 Español</option>
+          </select>
+        </label>
+      </div>
+      <section id="career-grid" class="career-grid"></section>
+    </main>
+  </div>
+
+  <!-- "Dashboard" tab: stats, memory-strength-by-course, recent activity and
+       badges, all derived from localStorage history (see renderDashboard). -->
+  <div id="view-dashboard" class="hidden">
+  <main id="dashboard-layout">
+    <div class="dash-header">
+      <div>
+        <h2 id="dashboard-title" class="headline">Painel de Performance</h2>
+        <p id="dashboard-subtitle" class="hint"></p>
+      </div>
+      <button id="btn-dashboard-start" class="btn-primary btn-cta" type="button">
+        <span class="material-symbols-outlined">play_arrow</span>
+        <span id="dashboard-start-label">Iniciar Treino</span>
+      </button>
+    </div>
+
+    <section class="stat-grid" id="dashboard-stats"></section>
+
+    <section class="card progression-section">
+      <div class="progression-header">
+        <h3 id="progression-title" class="headline-sm">Progressão profissional</h3>
+        <button id="btn-reset-progress" class="btn-text-danger" type="button">Reiniciar XP</button>
+      </div>
+      <div id="progression-card"></div>
+    </section>
+
+    <section class="dash-grid">
+      <div class="card">
+        <h3 id="memory-strength-title" class="headline-sm"></h3>
+        <div id="memory-strength-bars"></div>
+      </div>
+      <div class="card">
+        <h3 id="recent-activity-title" class="headline-sm"></h3>
+        <div id="recent-activity-list"></div>
+      </div>
+    </section>
+
+    <section class="dashboard-analysis-grid">
+      <div class="card">
+        <h3 id="performance-trend-title" class="headline-sm"></h3>
+        <div id="performance-trend"></div>
+      </div>
+      <div class="card">
+        <h3 id="performance-insights-title" class="headline-sm"></h3>
+        <div id="performance-insights"></div>
+      </div>
+    </section>
+
+    <section class="dashboard-analysis-grid">
+      <div class="card">
+        <h3 id="language-stats-title" class="headline-sm"></h3>
+        <div id="language-stats"></div>
+      </div>
+      <div class="card">
+        <h3 id="difficulty-stats-title" class="headline-sm"></h3>
+        <div id="difficulty-stats"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 id="badges-title" class="headline-sm"></h3>
+      <div class="badge-grid" id="badges-grid"></div>
+    </section>
+  </main>
+  </div>
+
+  <!-- Always visible, regardless of which top-level tab is active. -->
+  <footer id="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="footer-bell material-symbols-outlined">room_service</span>
+        <div><strong id="footer-title">Full House</strong><span id="footer-tagline"></span></div>
+      </div>
+      <p id="footer-credit"></p>
+      <span class="footer-year">© 2026</span>
+    </div>
+  </footer>
+
+</div>
+<!-- data.js must load first: app.js reads its constants (MENU_POOL, UI, ...)
+     as soon as it runs, both files share the global scope (no modules/bundler).
+     The "?v=" query bumps on each edit purely to dodge browser caching during
+     local testing — most static hosts fingerprint filenames on deploy so
+     this won't matter once the site is actually published. -->
+<script src="data.js?v=9"></script>
+<script src="app.js?v=12"></script>
+</body>
+</html>

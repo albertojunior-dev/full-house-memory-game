@@ -1,0 +1,248 @@
+{
+  "pt": [
+    {
+      "avatar": 1,
+      "gender": "male",
+      "folder": "avatar_01",
+      "shortName": "pt-PT-DuarteNeural",
+      "locale": "pt-PT",
+      "displayName": "Duarte"
+    },
+    {
+      "avatar": 2,
+      "gender": "female",
+      "folder": "avatar_02",
+      "shortName": "pt-PT-FernandaNeural",
+      "locale": "pt-PT",
+      "displayName": "Fernanda"
+    },
+    {
+      "avatar": 3,
+      "gender": "female",
+      "folder": "avatar_03",
+      "shortName": "pt-PT-RaquelNeural",
+      "locale": "pt-PT",
+      "displayName": "Raquel"
+    },
+    {
+      "avatar": 4,
+      "gender": "male",
+      "folder": "avatar_04",
+      "shortName": "pt-BR-AntonioNeural",
+      "locale": "pt-BR",
+      "displayName": "Antonio"
+    },
+    {
+      "avatar": 5,
+      "gender": "female",
+      "folder": "avatar_05",
+      "shortName": "pt-BR-BrendaNeural",
+      "locale": "pt-BR",
+      "displayName": "Brenda"
+    },
+    {
+      "avatar": 6,
+      "gender": "male",
+      "folder": "avatar_06",
+      "shortName": "pt-BR-DonatoNeural",
+      "locale": "pt-BR",
+      "displayName": "Donato"
+    },
+    {
+      "avatar": 7,
+      "gender": "female",
+      "folder": "avatar_07",
+      "shortName": "pt-BR-ElzaNeural",
+      "locale": "pt-BR",
+      "displayName": "Elza"
+    },
+    {
+      "avatar": 8,
+      "gender": "male",
+      "folder": "avatar_08",
+      "shortName": "pt-BR-FabioNeural",
+      "locale": "pt-BR",
+      "displayName": "Fabio"
+    },
+    {
+      "avatar": 9,
+      "gender": "male",
+      "folder": "avatar_09",
+      "shortName": "pt-BR-HumbertoNeural",
+      "locale": "pt-BR",
+      "displayName": "Humberto"
+    },
+    {
+      "avatar": 10,
+      "gender": "male",
+      "folder": "avatar_10",
+      "shortName": "pt-BR-JulioNeural",
+      "locale": "pt-BR",
+      "displayName": "Julio"
+    }
+  ],
+  "en": [
+    {
+      "avatar": 1,
+      "gender": "male",
+      "folder": "avatar_01",
+      "shortName": "en-GB-AlfieNeural",
+      "locale": "en-GB",
+      "displayName": "Alfie"
+    },
+    {
+      "avatar": 2,
+      "gender": "female",
+      "folder": "avatar_02",
+      "shortName": "en-GB-AbbiNeural",
+      "locale": "en-GB",
+      "displayName": "Abbi"
+    },
+    {
+      "avatar": 3,
+      "gender": "female",
+      "folder": "avatar_03",
+      "shortName": "en-GB-AdaMultilingualNeural",
+      "locale": "en-GB",
+      "displayName": "Ada Multilingual"
+    },
+    {
+      "avatar": 4,
+      "gender": "male",
+      "folder": "avatar_04",
+      "shortName": "en-GB-ElliotNeural",
+      "locale": "en-GB",
+      "displayName": "Elliot"
+    },
+    {
+      "avatar": 5,
+      "gender": "female",
+      "folder": "avatar_05",
+      "shortName": "en-GB-BellaNeural",
+      "locale": "en-GB",
+      "displayName": "Bella"
+    },
+    {
+      "avatar": 6,
+      "gender": "male",
+      "folder": "avatar_06",
+      "shortName": "en-GB-EthanNeural",
+      "locale": "en-GB",
+      "displayName": "Ethan"
+    },
+    {
+      "avatar": 7,
+      "gender": "female",
+      "folder": "avatar_07",
+      "shortName": "en-GB-HollieNeural",
+      "locale": "en-GB",
+      "displayName": "Hollie"
+    },
+    {
+      "avatar": 8,
+      "gender": "male",
+      "folder": "avatar_08",
+      "shortName": "en-GB-NoahNeural",
+      "locale": "en-GB",
+      "displayName": "Noah"
+    },
+    {
+      "avatar": 9,
+      "gender": "male",
+      "folder": "avatar_09",
+      "shortName": "en-GB-OliverNeural",
+      "locale": "en-GB",
+      "displayName": "Oliver"
+    },
+    {
+      "avatar": 10,
+      "gender": "male",
+      "folder": "avatar_10",
+      "shortName": "en-GB-OllieMultilingualNeural",
+      "locale": "en-GB",
+      "displayName": "Ollie Multilingual"
+    }
+  ],
+  "es": [
+    {
+      "avatar": 1,
+      "gender": "male",
+      "folder": "avatar_01",
+      "shortName": "es-ES-AlvaroNeural",
+      "locale": "es-ES",
+      "displayName": "Alvaro"
+    },
+    {
+      "avatar": 2,
+      "gender": "female",
+      "folder": "avatar_02",
+      "shortName": "es-ES-AbrilNeural",
+      "locale": "es-ES",
+      "displayName": "Abril"
+    },
+    {
+      "avatar": 3,
+      "gender": "female",
+      "folder": "avatar_03",
+      "shortName": "es-ES-ArabellaMultilingualNeural",
+      "locale": "es-ES",
+      "displayName": "Arabella Multilingual"
+    },
+    {
+      "avatar": 4,
+      "gender": "male",
+      "folder": "avatar_04",
+      "shortName": "es-ES-ArnauNeural",
+      "locale": "es-ES",
+      "displayName": "Arnau"
+    },
+    {
+      "avatar": 5,
+      "gender": "female",
+      "folder": "avatar_05",
+      "shortName": "es-ES-ElviraNeural",
+      "locale": "es-ES",
+      "displayName": "Elvira"
+    },
+    {
+      "avatar": 6,
+      "gender": "male",
+      "folder": "avatar_06",
+      "shortName": "es-ES-DarioNeural",
+      "locale": "es-ES",
+      "displayName": "Dario"
+    },
+    {
+      "avatar": 7,
+      "gender": "female",
+      "folder": "avatar_07",
+      "shortName": "es-ES-EstrellaNeural",
+      "locale": "es-ES",
+      "displayName": "Estrella"
+    },
+    {
+      "avatar": 8,
+      "gender": "male",
+      "folder": "avatar_08",
+      "shortName": "es-ES-EliasNeural",
+      "locale": "es-ES",
+      "displayName": "Elias"
+    },
+    {
+      "avatar": 9,
+      "gender": "male",
+      "folder": "avatar_09",
+      "shortName": "es-ES-NilNeural",
+      "locale": "es-ES",
+      "displayName": "Nil"
+    },
+    {
+      "avatar": 10,
+      "gender": "male",
+      "folder": "avatar_10",
+      "shortName": "es-ES-SaulNeural",
+      "locale": "es-ES",
+      "displayName": "Saul"
+    }
+  ]
+}

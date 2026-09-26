@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+._*
+__MACOSX/
+
+# Secrets and local environment variables
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python cache and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# JavaScript dependencies and build output (if added later)
+node_modules/
+dist/
+build/
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs, coverage and temporary files
+*.log
+coverage/
+.cache/
+tmp/
+temp/
+
+# Local server/runtime files
+*.pid
+.python-version

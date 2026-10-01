@@ -11,6 +11,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mesa Cheia — Treino de Empregado de Mesa</title>
+<script>
+  (() => {
+    try {
+      const saved = localStorage.getItem("mesaCheia.theme");
+      const theme = saved || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+      document.documentElement.dataset.theme = theme;
+    } catch (e) {
+      document.documentElement.dataset.theme = "dark";
+    }
+  })();
+</script>
 <!-- The same service-bell emblem used beside the Full House wordmark. -->
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=3" />
 <link rel="apple-touch-icon" href="assets/favicon.svg?v=3" />
@@ -590,7 +601,7 @@ select, input[type="number"], input[type="text"] {
 
 .empty-note { color: var(--muted); font-style: italic; padding: 12px 0; }
 </style>
-<link rel="stylesheet" href="redesign.css?v=3" />
+<link rel="stylesheet" href="redesign.css?v=4" />
 </head>
 <body>
 <!--
@@ -604,13 +615,14 @@ select, input[type="number"], input[type="text"] {
 
   <!-- Top bar: brand, Training/Dashboard tab switcher, mute toggle. -->
   <header id="navbar">
-    <div class="brand-lockup">
+    <div class="navbar-inner">
+    <button id="btn-brand-home" class="brand-lockup brand-home-link" type="button" aria-label="Voltar à introdução">
       <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined">room_service</span></span>
       <div>
       <h1 id="app-title">Mesa Cheia</h1>
       <p id="app-subtitle">Treino de memória para empregados de mesa</p>
       </div>
-    </div>
+    </button>
     <div class="navbar-right">
       <div id="player-summary" class="player-summary">
         <span id="player-level" class="player-level">N. 1</span>
@@ -621,9 +633,13 @@ select, input[type="number"], input[type="text"] {
         <button id="nav-career" class="nav-link" type="button">Carreira</button>
         <button id="nav-dashboard" class="nav-link" type="button">Dashboard</button>
       </nav>
+      <button id="btn-theme" class="mute-btn" type="button" aria-label="Mudar tema">
+        <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+      </button>
       <button id="btn-mute" class="mute-btn" type="button">
         <span class="material-symbols-outlined" id="mute-icon">volume_up</span>
       </button>
+    </div>
     </div>
   </header>
 
@@ -633,14 +649,81 @@ select, input[type="number"], input[type="text"] {
   <div id="view-training">
   <main id="main-layout">
 
+    <!-- Informative landing page. The existing setup and table remain the
+         next steps and are intentionally kept separate from this screen. -->
+    <section id="screen-home" class="screen home-screen">
+      <div class="home-hero">
+        <div class="home-hero-copy">
+          <span id="home-eyebrow" class="home-eyebrow">Full House Training Academy</span>
+          <h2 id="home-title" class="home-title">Treina a memória. Domina a sala.</h2>
+          <p id="home-description" class="home-description"></p>
+          <div class="home-actions">
+            <button id="btn-home-start" class="btn-primary home-primary" type="button">
+              <span id="home-start-label">Começar treino</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+            <a id="home-learn-link" class="home-link" href="#home-how">Como funciona</a>
+          </div>
+          <div class="home-proof" aria-label="Funcionalidades principais">
+            <span><strong>10</strong><small id="home-proof-voices">vozes distintas</small></span>
+            <span><strong>3</strong><small id="home-proof-languages">idiomas</small></span>
+            <span><strong>1–10</strong><small id="home-proof-guests">clientes por mesa</small></span>
+          </div>
+        </div>
+        <aside class="home-progress-card" aria-labelledby="home-progress-title">
+          <div class="home-progress-top">
+            <span class="material-symbols-outlined">workspace_premium</span>
+            <span id="home-progress-title">A tua evolução</span>
+          </div>
+          <div class="home-progress-level">
+            <strong id="home-level-value">N. 1</strong>
+            <span id="home-title-value">Aprendiz de Serviço</span>
+          </div>
+          <div class="home-progress-grid">
+            <div><strong id="home-tables-value">0</strong><span id="home-tables-label">mesas concluídas</span></div>
+            <div><strong id="home-accuracy-value">—</strong><span id="home-accuracy-label">precisão média</span></div>
+          </div>
+          <div class="home-progress-bar"><span id="home-progress-fill"></span></div>
+          <p id="home-progress-caption"></p>
+        </aside>
+      </div>
+
+      <section id="home-how" class="home-section">
+        <div class="home-section-heading">
+          <span id="home-how-kicker" class="home-eyebrow">Como funciona</span>
+          <h3 id="home-how-title">Da escuta ao serviço, em três passos.</h3>
+          <p id="home-how-description"></p>
+        </div>
+        <div class="home-step-grid">
+          <article class="home-step"><span class="home-step-number">01</span><span class="material-symbols-outlined">hearing</span><h4 id="home-step1-title">Ouve</h4><p id="home-step1-text"></p></article>
+          <article class="home-step"><span class="home-step-number">02</span><span class="material-symbols-outlined">psychology</span><h4 id="home-step2-title">Associa</h4><p id="home-step2-text"></p></article>
+          <article class="home-step"><span class="home-step-number">03</span><span class="material-symbols-outlined">insights</span><h4 id="home-step3-title">Regista e evolui</h4><p id="home-step3-text"></p></article>
+        </div>
+      </section>
+
+      <section class="home-features home-section">
+        <article><span class="material-symbols-outlined">record_voice_over</span><div><h4 id="home-feature1-title">Vozes naturais</h4><p id="home-feature1-text"></p></div></article>
+        <article><span class="material-symbols-outlined">tune</span><div><h4 id="home-feature2-title">Treino gradual</h4><p id="home-feature2-text"></p></div></article>
+        <article><span class="material-symbols-outlined">leaderboard</span><div><h4 id="home-feature3-title">Progresso visível</h4><p id="home-feature3-text"></p></div></article>
+      </section>
+
+      <section class="home-final-cta">
+        <span class="material-symbols-outlined">room_service</span>
+        <div><h3 id="home-final-title">Pronto para a próxima mesa?</h3><p id="home-final-text"></p></div>
+        <button id="btn-home-start-secondary" class="btn-primary" type="button"><span id="home-final-button">Configurar treino</span><span class="material-symbols-outlined">arrow_forward</span></button>
+      </section>
+    </section>
+
     <!-- Step 1: table setup (language, guest count, order style, menu mode). -->
-    <section id="screen-setup" class="screen">
+    <section id="screen-setup" class="screen hidden">
+      <button id="btn-setup-back" class="home-back" type="button"><span class="material-symbols-outlined">arrow_back</span><span id="setup-back-label">Voltar à apresentação</span></button>
       <div class="setup-emblem" aria-hidden="true">
         <span class="setup-emblem-ring"></span>
         <span class="material-symbols-outlined">room_service</span>
       </div>
       <p id="welcome-text" class="welcome-text"></p>
-      <div class="card">
+      <div class="card setup-grid">
+        <div class="setup-field-group">
         <label class="field">
           <span id="label-lang" class="field-label">Idioma da mesa</span>
           <select id="input-lang">
@@ -649,18 +732,24 @@ select, input[type="number"], input[type="text"] {
             <option value="es">🇪🇸 Español</option>
           </select>
         </label>
+        </div>
 
+        <div class="setup-field-group">
         <label class="field">
           <span id="label-people" class="field-label">Quantas pessoas na mesa?</span>
           <input id="input-people" type="number" min="1" max="10" value="3" />
         </label>
+        </div>
 
+        <div class="setup-field-group setup-option-group">
         <label class="field field-checkbox">
           <input id="input-recap" type="checkbox" checked />
           <span id="label-recap">Repetir o pedido todo no fim, antes de fechar a mesa</span>
         </label>
         <p id="recap-help" class="field-help"></p>
+        </div>
 
+        <div class="setup-field-group">
         <label class="field">
           <span id="label-difficulty" class="field-label">Dificuldade</span>
           <select id="input-difficulty">
@@ -671,19 +760,25 @@ select, input[type="number"], input[type="text"] {
           </select>
           <small id="difficulty-help" class="field-help"></small>
         </label>
+        </div>
 
+        <div class="setup-field-group setup-option-group">
         <label class="field field-checkbox">
           <input id="input-similar-orders" type="checkbox" />
           <span id="label-similar-orders">Incluir pedidos semelhantes</span>
         </label>
         <p id="similar-orders-help" class="field-help"></p>
+        </div>
 
+        <div class="setup-field-group setup-option-group">
         <label class="field field-checkbox">
           <input id="input-rush-hour" type="checkbox" />
           <span id="label-rush-hour">Ativar Rush Hour</span>
         </label>
         <p id="rush-hour-help" class="field-help"></p>
+        </div>
 
+        <div class="setup-field-group">
         <label class="field">
           <span id="label-order-style" class="field-label">Como o pedido é tirado?</span>
           <select id="input-order-style">
@@ -692,7 +787,9 @@ select, input[type="number"], input[type="text"] {
             <option value="byCourse">Por curso</option>
           </select>
         </label>
+        </div>
 
+        <div class="setup-field-group">
         <label class="field">
           <span id="label-menu-mode" class="field-label">Como definir o menu de hoje?</span>
           <select id="input-menu-mode">
@@ -700,7 +797,9 @@ select, input[type="number"], input[type="text"] {
             <option value="custom">Escolher os pratos</option>
           </select>
         </label>
+        </div>
 
+        <div class="setup-field-group setup-field-wide">
         <label class="field">
           <span id="label-training-focus" class="field-label">O que queres treinar?</span>
           <select id="input-training-focus">
@@ -710,8 +809,9 @@ select, input[type="number"], input[type="text"] {
             <option value="mains">Prato principal + acompanhamento</option>
           </select>
         </label>
+        </div>
 
-        <button id="btn-start" class="btn-primary">Nova Mesa</button>
+        <button id="btn-start" class="btn-primary setup-field-wide">Nova Mesa</button>
       </div>
     </section>
 
@@ -913,11 +1013,14 @@ select, input[type="number"], input[type="text"] {
   <!-- Always visible, regardless of which top-level tab is active. -->
   <footer id="site-footer">
     <div class="footer-inner">
-      <div class="footer-brand">
+      <button id="btn-footer-home" class="footer-brand footer-home-link" type="button" aria-label="Voltar à introdução">
         <span class="footer-bell material-symbols-outlined">room_service</span>
         <div><strong id="footer-title">Full House</strong><span id="footer-tagline"></span></div>
-      </div>
+      </button>
       <p id="footer-credit"></p>
+      <a class="footer-github" href="https://github.com/albertojunior-dev" target="_blank" rel="noopener noreferrer" aria-label="GitHub — Alberto Junior" title="GitHub — Alberto Junior">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .7a11.3 11.3 0 0 0-3.57 22c.57.1.78-.24.78-.55v-2.2c-3.18.7-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.96.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.58 0-1.23.44-2.24 1.17-3.03-.12-.29-.51-1.45.11-2.99 0 0 .95-.3 3.11 1.16A10.8 10.8 0 0 1 12 6.01c.96 0 1.92.13 2.83.38 2.16-1.46 3.11-1.16 3.11-1.16.62 1.54.23 2.7.11 2.99.73.79 1.17 1.8 1.17 3.03 0 4.32-2.68 5.28-5.23 5.57.41.35.77 1.05.77 2.12v3.21c0 .31.21.66.79.55A11.3 11.3 0 0 0 12 .7Z"/></svg>
+      </a>
       <span class="footer-year">© 2026</span>
     </div>
   </footer>
@@ -928,7 +1031,7 @@ select, input[type="number"], input[type="text"] {
      The "?v=" query bumps on each edit purely to dodge browser caching during
      local testing — most static hosts fingerprint filenames on deploy so
      this won't matter once the site is actually published. -->
-<script src="data.js?v=9"></script>
-<script src="app.js?v=12"></script>
+<script src="data.js?v=10"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

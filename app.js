@@ -453,6 +453,44 @@ const els = {
   footerTagline: document.getElementById("footer-tagline"),
   btnMute: document.getElementById("btn-mute"),
   muteIcon: document.getElementById("mute-icon"),
+  btnTheme: document.getElementById("btn-theme"),
+  themeIcon: document.getElementById("theme-icon"),
+  btnBrandHome: document.getElementById("btn-brand-home"),
+  btnFooterHome: document.getElementById("btn-footer-home"),
+
+  screenHome: document.getElementById("screen-home"),
+  btnHomeStart: document.getElementById("btn-home-start"),
+  btnHomeStartSecondary: document.getElementById("btn-home-start-secondary"),
+  btnSetupBack: document.getElementById("btn-setup-back"),
+  setupBackLabel: document.getElementById("setup-back-label"),
+  homeEyebrow: document.getElementById("home-eyebrow"),
+  homeTitle: document.getElementById("home-title"),
+  homeDescription: document.getElementById("home-description"),
+  homeStartLabel: document.getElementById("home-start-label"),
+  homeLearnLink: document.getElementById("home-learn-link"),
+  homeProofVoices: document.getElementById("home-proof-voices"),
+  homeProofLanguages: document.getElementById("home-proof-languages"),
+  homeProofGuests: document.getElementById("home-proof-guests"),
+  homeProgressTitle: document.getElementById("home-progress-title"),
+  homeLevelValue: document.getElementById("home-level-value"),
+  homeTitleValue: document.getElementById("home-title-value"),
+  homeTablesValue: document.getElementById("home-tables-value"),
+  homeTablesLabel: document.getElementById("home-tables-label"),
+  homeAccuracyValue: document.getElementById("home-accuracy-value"),
+  homeAccuracyLabel: document.getElementById("home-accuracy-label"),
+  homeProgressFill: document.getElementById("home-progress-fill"),
+  homeProgressCaption: document.getElementById("home-progress-caption"),
+  homeHowKicker: document.getElementById("home-how-kicker"),
+  homeHowTitle: document.getElementById("home-how-title"),
+  homeHowDescription: document.getElementById("home-how-description"),
+  homeStep1Title: document.getElementById("home-step1-title"), homeStep1Text: document.getElementById("home-step1-text"),
+  homeStep2Title: document.getElementById("home-step2-title"), homeStep2Text: document.getElementById("home-step2-text"),
+  homeStep3Title: document.getElementById("home-step3-title"), homeStep3Text: document.getElementById("home-step3-text"),
+  homeFeature1Title: document.getElementById("home-feature1-title"), homeFeature1Text: document.getElementById("home-feature1-text"),
+  homeFeature2Title: document.getElementById("home-feature2-title"), homeFeature2Text: document.getElementById("home-feature2-text"),
+  homeFeature3Title: document.getElementById("home-feature3-title"), homeFeature3Text: document.getElementById("home-feature3-text"),
+  homeFinalTitle: document.getElementById("home-final-title"), homeFinalText: document.getElementById("home-final-text"),
+  homeFinalButton: document.getElementById("home-final-button"),
 
   screenSetup: document.getElementById("screen-setup"),
   screenGame: document.getElementById("screen-game"),
@@ -591,6 +629,34 @@ function applySetupUIText() {
   els.footerTitle.textContent = s.appTitle;
   els.footerTagline.textContent = s.footerTagline;
   els.btnMute.title = state.muted ? s.unmuteLabel : s.muteLabel;
+  els.btnTheme.title = document.documentElement.dataset.theme === "dark" ? s.themeLight : s.themeDark;
+  els.btnTheme.setAttribute("aria-label", els.btnTheme.title);
+  els.btnBrandHome.setAttribute("aria-label", s.brandHomeLabel);
+  els.btnFooterHome.setAttribute("aria-label", s.brandHomeLabel);
+  els.homeEyebrow.textContent = s.homeEyebrow;
+  els.homeTitle.textContent = s.homeTitle;
+  els.homeDescription.textContent = s.homeDescription;
+  els.homeStartLabel.textContent = s.homeStart;
+  els.homeLearnLink.textContent = s.homeLearn;
+  els.homeProofVoices.textContent = s.homeProofVoices;
+  els.homeProofLanguages.textContent = s.homeProofLanguages;
+  els.homeProofGuests.textContent = s.homeProofGuests;
+  els.homeProgressTitle.textContent = s.homeProgressTitle;
+  els.homeTablesLabel.textContent = s.homeTables;
+  els.homeAccuracyLabel.textContent = s.homeAccuracy;
+  els.homeHowKicker.textContent = s.homeHowKicker;
+  els.homeHowTitle.textContent = s.homeHowTitle;
+  els.homeHowDescription.textContent = s.homeHowDescription;
+  [1, 2, 3].forEach((n) => {
+    els[`homeStep${n}Title`].textContent = s[`homeStep${n}Title`];
+    els[`homeStep${n}Text`].textContent = s[`homeStep${n}Text`];
+    els[`homeFeature${n}Title`].textContent = s[`homeFeature${n}Title`];
+    els[`homeFeature${n}Text`].textContent = s[`homeFeature${n}Text`];
+  });
+  els.homeFinalTitle.textContent = s.homeFinalTitle;
+  els.homeFinalText.textContent = s.homeFinalText;
+  els.homeFinalButton.textContent = s.homeFinalButton;
+  els.setupBackLabel.textContent = s.setupBack;
   els.btnStart.textContent = s.startButton;
   els.navTraining.textContent = s.navTraining;
   els.navCareer.textContent = s.navCareer;
@@ -613,7 +679,39 @@ function applySetupUIText() {
   els.careerLang.value = state.lang;
   document.title = `${s.appTitle} — Waiter Memory Game`;
   updatePlayerSummary();
+  renderHomeProgress();
 }
+
+function renderHomeProgress() {
+  const s = t();
+  const profile = loadProfile();
+  const level = levelForXP(profile.totalXp);
+  const history = loadHistory();
+  const average = history.length ? Math.round(history.reduce((sum, item) => sum + (Number(item.pct) || 0), 0) / history.length) : null;
+  els.homeLevelValue.textContent = s.levelShort(level.level);
+  els.homeTitleValue.textContent = s[level.titleKey];
+  els.homeTablesValue.textContent = history.length;
+  els.homeAccuracyValue.textContent = average === null ? "—" : `${average}%`;
+  els.homeProgressFill.style.width = `${level.progress}%`;
+  els.homeProgressCaption.textContent = level.next ? s.homeProgressNext(level.next.xp - profile.totalXp, level.next.level) : s.homeProgressMax;
+}
+
+function currentTheme() {
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  els.themeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
+  els.btnTheme.title = theme === "dark" ? t().themeLight : t().themeDark;
+  els.btnTheme.setAttribute("aria-label", els.btnTheme.title);
+}
+
+els.btnTheme.addEventListener("click", () => {
+  const theme = currentTheme() === "dark" ? "light" : "dark";
+  applyTheme(theme);
+  try { localStorage.setItem("mesaCheia.theme", theme); } catch (e) { /* ignore */ }
+});
 
 els.inputDifficulty.addEventListener("change", applySetupUIText);
 
@@ -657,6 +755,37 @@ els.btnMute.addEventListener("click", () => {
 
 applySetupUIText();
 updateMuteIcon();
+applyTheme(currentTheme());
+
+function showHome() {
+  stopAudio();
+  stopTableTimer();
+  els.screenHome.classList.remove("hidden");
+  els.screenSetup.classList.add("hidden");
+  els.screenMenuBuilder.classList.add("hidden");
+  els.screenGame.classList.add("hidden");
+  renderHomeProgress();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function showSetup() {
+  stopAudio();
+  els.screenHome.classList.add("hidden");
+  els.screenSetup.classList.remove("hidden");
+  els.screenMenuBuilder.classList.add("hidden");
+  els.screenGame.classList.add("hidden");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+els.btnHomeStart.addEventListener("click", showSetup);
+els.btnHomeStartSecondary.addEventListener("click", showSetup);
+els.btnSetupBack.addEventListener("click", showHome);
+function goToIntroduction() {
+  setActiveView("training");
+  showHome();
+}
+els.btnBrandHome.addEventListener("click", goToIntroduction);
+els.btnFooterHome.addEventListener("click", goToIntroduction);
 
 // Picks which greeting clip/text fits right now, by the visitor's local
 // clock: mornings before noon, afternoons until 7pm, evenings after that.
@@ -1695,6 +1824,7 @@ function startTable(customMenu, options = {}) {
   if (options.maxSeconds) state.table.maxSeconds = options.maxSeconds;
   state.registered = {};
 
+  els.screenHome.classList.add("hidden");
   els.screenSetup.classList.add("hidden");
   els.screenMenuBuilder.classList.add("hidden");
   els.screenGame.classList.remove("hidden");
@@ -2003,7 +2133,10 @@ function setActiveView(view) {
 els.navTraining.addEventListener("click", () => setActiveView("training"));
 els.navCareer.addEventListener("click", () => setActiveView("career"));
 els.navDashboard.addEventListener("click", () => setActiveView("dashboard"));
-els.btnDashboardStart.addEventListener("click", () => setActiveView("training"));
+els.btnDashboardStart.addEventListener("click", () => {
+  setActiveView("training");
+  showSetup();
+});
 
 els.btnResetProgress.addEventListener("click", () => {
   const s = t();
@@ -2029,6 +2162,7 @@ els.btnResetProgress.addEventListener("click", () => {
   els.inputLang.value = state.lang;
   applySetupUIText();
 
+  els.screenHome.classList.add("hidden");
   els.screenSetup.classList.add("hidden");
   els.screenGame.classList.remove("hidden");
 

@@ -4,13 +4,20 @@ A free browser game that trains waitstaff to take a table's order **from memory 
 
 Built as a plain HTML/CSS/JavaScript site — no build step, no frameworks, no dependencies to install.
 
-## Version 9 highlights
+## Version 10 highlights
 
+- New informative landing page before the training setup, grounded in the game's real features and saved progress.
+- Persistent light/dark theme toggle with responsive layouts in both themes.
 - Audio stops immediately when the player leaves the listening stage.
 - The optional final review is now clearly explained and remains editable before scoring.
 - Four difficulty levels, a timed Rush Hour and intentionally similar orders.
 - Twelve achievements and a richer dashboard with trends, insights, language and difficulty breakdowns.
 - Improved avatar framing, responsive table layout, footer and high-visibility favicon.
+- The header and footer brand marks return directly to the informative introduction.
+- A compact responsive setup grid and viewport-aware table prevent unnecessary browser zooming.
+- The header content now stays aligned inside a controlled maximum width on very wide screens and at reduced zoom levels.
+- Setup option descriptions now remain inside their responsive cards at every supported width.
+- The footer includes a direct, accessible link to Alberto Junior's GitHub profile.
 
 ## Features
 
@@ -32,6 +39,8 @@ Built as a plain HTML/CSS/JavaScript site — no build step, no frameworks, no d
 - **Progress that respects existing players**: previous session history is converted into XP automatically, and XP can be reset independently without deleting performance statistics.
 - **Resilient sessions**: an accidental page refresh mid-table resumes exactly where you left off (`sessionStorage`); leaving on purpose is a deliberate, confirmed action that intentionally does not save the attempt.
 - **Mobile-first**: fully responsive, with a collapsible menu panel on small screens.
+- **Informative first step**: the landing page explains the training loop, highlights the real voice/language/table range and shows progress already stored in the browser before the player configures a session.
+- **Light and dark modes**: the interface follows the saved preference (or the device preference on first visit) and can be switched from the navigation bar.
 
 ## Running it locally
 
@@ -82,7 +91,7 @@ This creates a `.gitattributes` file. Commit that file together with the project
 
 ## Tech notes
 
-- **Storage**: `localStorage` for Dashboard history (capped at 300 sessions), the progression profile and the mute preference; `sessionStorage` for resuming an in-progress table after a refresh. All storage access is wrapped in `try/catch` since it can be unavailable (private browsing, disabled cookies, storage quota).
+- **Storage**: `localStorage` for Dashboard history (capped at 300 sessions), the progression profile, theme and mute preferences; `sessionStorage` for resuming an in-progress table after a refresh. All storage access is wrapped in `try/catch` since it can be unavailable (private browsing, disabled cookies, storage quota).
 - **No backend**: everything runs client-side, including audio playback (it's just static files). Nothing is sent to a server, and no personal data is collected.
 
 ## Author
